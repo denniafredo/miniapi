@@ -4,8 +4,12 @@ const response = require("../helper");
 const controller = {};
 
 controller.getAll = async function (req, res) {
+
   try {
-    const mahasiswa = await model.mahasiswa.findAll();
+    let mahasiswa;
+    mahasiswa = await model.mahasiswa.findAll(req.query ? {
+      where: req.query
+    } : null);
     res.send(response.ok(mahasiswa));
   } catch (error) {
     res.send(response.error(error.message));
@@ -55,17 +59,15 @@ controller.updateById = async function (req, res) {
 };
 
 controller.updateByQuery = async function (req, res) {
-  console.log(req.query);
 
-  // try {
-  //   console.log(req.query);
-  //   // const mahasiswa = await model.mahasiswa.update(req.body, {
-  //   //   where: { id: req.params.id },
-  //   // });
-  //   // res.send(response.updated(mahasiswa));
-  // } catch (error) {
-  //   res.send(response.error(error.message));
-  // }
+  try {
+    const mahasiswa = await model.mahasiswa.update(req.body, {
+      where: req.query,
+    });
+    res.send(response.updated(mahasiswa));
+  } catch (error) {
+    res.send(response.error(error.message));
+  }
 };
 
 module.exports = controller;

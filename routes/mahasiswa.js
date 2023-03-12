@@ -1,14 +1,7 @@
-const router = require('express').Router();
-const controllers = require('../controllers/mahasiswa');
+const router = require("express").Router();
+const mahasiswaController = require("../controllers/mahasiswa");
 
-router.route('/mahasiswa')
-    // to create new resources
-    .post(controllers.insertMahasiswa)
-    // to retrieve resource
-    .get(controllers.getAllMahasiswa);
-router.route('/mahasiswa/:id')
-    // to retrieve a single resource
-    .get(function (req, res, next) {
+router.route("/mahasiswa").get(mahasiswaController.getAll).post(mahasiswaController.create).put(mahasiswaController.updateByQuery);
+router.route("/mahasiswa/:id").get(mahasiswaController.getById).delete(mahasiswaController.deleteById).put(mahasiswaController.updateById);
 
-    })
 module.exports = router;

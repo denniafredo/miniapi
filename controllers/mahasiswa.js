@@ -1,13 +1,15 @@
 const model = require("../models");
 const response = require("../helper");
+const uploadFile = require("../middleware/uploadFileMiddleware");
+const path = require('path');
+const fs = require('fs');
 
 const controller = {};
 
 controller.getAll = async function (req, res) {
 
   try {
-    let mahasiswa;
-    mahasiswa = await model.mahasiswa.findAll(req.query ? {
+    const mahasiswa = await model.mahasiswa.findAll(req.query ? {
       where: req.query
     } : null);
     res.send(response.ok(mahasiswa));
@@ -17,7 +19,6 @@ controller.getAll = async function (req, res) {
 };
 
 controller.getById = async function (req, res) {
-  if (!req.params.id) return res.send(response.error("id body not found!"));
   try {
     const mahasiswa = await model.mahasiswa.findByPk(req.params.id);
     if (!mahasiswa) return res.send(response.nodata());
@@ -27,8 +28,29 @@ controller.getById = async function (req, res) {
   }
 };
 
+controller.downloadById = async function (req, res) {
+  try {
+    const mahasiswa = await model.mahasiswa.findByPk(req.params.id);
+    if (!mahasiswa || !mahasiswa.photo) return res.send(response.nodata());
+    let fileLocation = __basedir +'/file/uploads/'+ mahasiswa.photo;
+    if (!fs.existsSync(fileLocation)) {
+      return res.send(response.error("File not found!"));
+    }
+    res.download(fileLocation);
+  } catch (error) {
+    res.send(response.error(error.message));
+  }
+};
+
 controller.create = async function (req, res) {
   try {
+    const statusUpload = await uploadFile(req, res);
+    console.log(statusUpload);
+    if (req.file == undefined) {
+      return res.send(response.error("Upload a file please!"));
+    }
+    const filename = req.file.originalname;
+    req.body.photo = filename;
     const mahasiswa = await model.mahasiswa.create(req.body);
     res.send(response.created(mahasiswa));
   } catch (error) {

@@ -22,6 +22,10 @@ const mahasiswa = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    photo: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,
